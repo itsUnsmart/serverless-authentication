@@ -1,0 +1,29 @@
+{
+  "name": "serverless-authentication",
+  "version": "1.0.0",
+  "description": "Authy Boi",
+  "main": "build/index.js",
+  "scripts": {
+    "start:dev": "cross-env NODE_ENV=development webpack",
+    "run:dev": "cross-env NODE_ENV=development nodemon dev-build/index.js",
+    "build": "webpack",
+    "deploy": "npm run build && serverless deploy --stage prod",
+    "deploy:dev": "npm run build && serverless deploy --stage dev"
+  },
+  "author": "Garret Harp <garret@smartprograms.co>",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jws": "^3.2.2",
+    "@types/node": "^14.0.27",
+    "cross-env": "^7.0.2",
+    "nodemon": "^2.0.4",
+    "raw-loader": "^4.0.1",
+    "terser-webpack-plugin": "^4.1.0",
+    "ts-loader": "^8.0.2",
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-node-externals": "^2.5.0",
+    "webpack-shell-plugin": "^0.5.0"
+  }
+}
