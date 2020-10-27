@@ -1,7 +1,7 @@
 const path = require('path')
 
 const nodeExternals = require('webpack-node-externals')
-const WebpackShellPlugin = require('webpack-shell-plugin')
+// const WebpackShellPlugin = require('webpack-shell-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
 const {
@@ -11,13 +11,15 @@ const {
 const isDevelopment = NODE_ENV === 'development'
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: {
+    'login/discord': './src/login/discord.ts'
+  },
   mode: NODE_ENV,
   watch: isDevelopment,
   target: 'node',
   output: {
     path: path.resolve(__dirname, isDevelopment ? 'dev-build' : 'build'),
-    filename: 'index.js',
+    filename: '[name].js',
     libraryTarget: 'commonjs2'
   },
   resolve: {
@@ -50,21 +52,5 @@ module.exports = {
     __dirname: false,
     global: false
   },
-
-  ...(isDevelopment ?
-    // Development Extensions
-    {
-      externals: [nodeExternals()],
-      plugins: [
-        new WebpackShellPlugin({
-          onBuildEnd: ['npm run run:dev']
-        })
-      ]
-    } :
-    // Production Extensions
-    {
-      externals: ['aws-sdk'],
-      plugins: [
-      ]
-    })
+  externals: [isDevelopment ? nodeExternals() : 'aws-sdk']
 }

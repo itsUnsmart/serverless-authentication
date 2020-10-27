@@ -21,6 +21,20 @@ export const cleanObject = <T>(object: T): Partial<T> => {
     return object
 }
 
+export const safeParse = (body?: string | null) => {
+    try {
+        const parsed = JSON.parse(body ?? '{}')
+        return parsed
+    } catch (error) {
+        return {}
+    }
+}
+
+export const toResponse = (body: { [key: string]: any }) => ({
+    statusCode: 200,
+    body: JSON.stringify(body)
+})
+
 // export const removeSensitive = (user: ReturnType<typeof User> | (ReturnType<typeof User>)[]) => {
 //     return (Array.isArray(user) ? user : [user]).map(user => {
 

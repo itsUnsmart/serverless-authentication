@@ -1,0 +1,63 @@
+service: auth
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  stage: staging
+  httpApi:
+    cors:
+      allowedOrigins:
+        - https://hoppscotch.io
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - GET
+        - POST
+      allowCredentials: true
+    authorizers:
+      mainJwtAuthorizer:
+        identitySource: $request.header.Authorization
+        issuerUrl: auth.smartprograms.co
+        audience:
+          - chat.smartprograms.co
+
+functions:
+  loginDiscord:
+    handler:
+      - ${self:custom.prefix.${self:custom.stage}}/login/discord.handler
+    package:
+      include:
+        - ${self:custom.prefix.${self:custom.stage}}/login/discord.ts
+    events:
+      - httpApi:
+          method: POST
+          path: /login/discord
+
+plugins:
+  - serverless-offline
+  # - serverless-domain-manager
+  # - serverless-prune-plugin
+
+package:
+  individually: true
+  exclude:
+    - ./**
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  prefix:
+    prod: 'build'
+    staging: 'dev-build'
+  # domains:
+  #   prod: 'auth.gchserverless.com'
+  #   staging: 'staging-auth.gchserverless.com'
+  # customDomain:
+  #   domainName: ${self:custom.domains.${self:custom.stage}}
+  #   basePath: 'users'
+  #   stage: ${self:custom.stage}
+  #   createRoute53Record: true
+  # prune:
+  #   automatic: true
+  #   number: 2
