@@ -12,9 +12,13 @@ export const getAuthorization = (token?: string) => {
     try {
         if (token === undefined || token === '') return Authorization({}, false)
 
-        const { payload } = JWT.verify({ token, keys: KeyManager.privateKeys })
+        if (token.includes('.')) {
+            const { payload } = JWT.verify({ token, keys: KeyManager.privateKeys })
 
-        return Authorization(payload)
+            return Authorization(payload)
+        } else {
+            return Authorization(JSON.parse(Buffer.from(token, 'base64').toString('utf8')))
+        }
     } catch (error) {
         return Authorization({})
     }
@@ -32,12 +36,21 @@ export const createAuthTokens = ({ product, user }: { product: ReturnType<typeof
     }
 
     const { jwt: accessToken, payload: { exp } } = JWT.create({ ...defaults, data: { tag: user.name.tag, name: user.name.display, email: user.email.value, role: user.role } })
-    const { jwt: refreshToken, payload: { jti } } = JWT.create({ ...defaults, expiresIn: Config.refreshExpires, data: { jti: Nano.generate() } })
+
+    const refreshData = {
+        iss: Config.issuer,
+        sub: user.id,
+        aud: product.url,
+        exp: Math.floor((Date.now() + Config.refreshExpires) / 1000),
+        jti: Nano.generate()
+    }
+
+    const refreshToken = Buffer.from(JSON.stringify(refreshData)).toString('base64')
 
     return {
         accessToken,
         refreshToken,
-        jti,
+        jti: refreshData.jti,
         expiresAt: new Date(exp * 1000)
     }
 }

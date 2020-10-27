@@ -25,10 +25,10 @@ const Expiration = (time: number) => {
     }
 }
 
-const Refresh = (token?: string) => {
+const Refresh = (jti?: string) => {
     return {
-        token: typeof token === 'string' && token,
-        isRefresh: typeof token === 'string'
+        token: typeof jti === 'string' && jti,
+        isRefresh: typeof jti === 'string'
     }
 }
 

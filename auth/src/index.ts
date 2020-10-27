@@ -19,4 +19,3 @@ const authTokens = createAuthTokens({ user, product: Products.chat })
 
 console.log('Access Token:', getAuthorization(authTokens.accessToken))
 console.log('Refresh Token:', getAuthorization(authTokens.refreshToken))
-console.log(getAuthorization())
