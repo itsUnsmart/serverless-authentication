@@ -50,7 +50,6 @@ export const createAuthTokens = ({ product, user }: { product: ReturnType<typeof
     return {
         accessToken,
         refreshToken,
-        jti: refreshData.jti,
         expiresAt: new Date(exp * 1000)
     }
 }
