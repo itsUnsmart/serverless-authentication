@@ -1,8 +1,10 @@
 import OAuth from '../../../packages/oauth2/src'
 import User from '../../../shared/models/user'
+import Products from '../../../shared/products'
 
 import { APIGatewayProxyHandlerV2 } from 'aws-lambda'
 import { responseJson, safeParse } from '../../../shared/utils'
+import { createAuthTokens } from '../../../packages/authorization/src'
 
 // https://accounts.google.com/o/oauth2/v2/auth?response_type=code&access_type=offline&client_id=164424209671-js2k7pghm8mt8lol96160k0qaupvgn44.apps.googleusercontent.com&redirect_uri=http://localhost:3000&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
 
@@ -41,6 +43,5 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
 
     // TODO: Create user in DB if not exists
 
-    // TODO: Create auth JWT and respond with that info
-    return responseJson({ user }, headers)
+    return responseJson(createAuthTokens({ user, product: Products.chat }), headers)
 }

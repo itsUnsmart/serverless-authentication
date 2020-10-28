@@ -1,8 +1,10 @@
 import OAuth from '../../../packages/oauth2/src'
 import User from '../../../shared/models/user'
+import Products from '../../../shared/products'
 
 import { APIGatewayProxyHandlerV2 } from 'aws-lambda'
 import { responseJson, safeParse } from '../../../shared/utils'
+import { createAuthTokens } from '../../../packages/authorization/src'
 
 // https://discord.com/api/oauth2/authorize?client_id=771100200860123166&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code&scope=identify%20email
 
@@ -41,6 +43,5 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
 
     // TODO: Create user in DB if not exists
 
-    // TODO: Create auth JWT and respond with that info
-    return responseJson({ user }, headers)
+    return responseJson(createAuthTokens({ user, product: Products.chat }), headers)
 }
