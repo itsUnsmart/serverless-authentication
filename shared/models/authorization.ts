@@ -25,19 +25,19 @@ const Expiration = (time: number) => {
     }
 }
 
-const Refresh = (jti?: string) => {
+const Refresh = (jti: string, isRefresh: boolean) => {
     return {
-        token: typeof jti === 'string' && jti,
-        isRefresh: typeof jti === 'string'
+        isRefresh,
+        token: typeof jti === 'string' && jti
     }
 }
 
-export default (payload: IAuthPayload, provided = true) => {
+export default (payload: IAuthPayload, isRefresh = false, provided = true) => {
     const issuer = Issuer(payload.iss)
     const product = Product(payload.aud)
     const user = User({ id: payload.sub, role: payload.role, name: { tag: payload.tag, display: payload.name }, email: { value: payload.email } })
     const expiration = Expiration(payload.exp ?? 0)
-    const refresh = Refresh(payload.jti)
+    const refresh = Refresh(payload.jti, isRefresh)
 
     return {
         issuer,

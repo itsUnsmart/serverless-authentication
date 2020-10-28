@@ -12,7 +12,10 @@ const isDevelopment = NODE_ENV === 'development'
 
 module.exports = {
   entry: {
-    'login/discord': './src/login/discord.ts'
+    'login/discord': './src/login/discord.ts',
+    'login/twitch': './src/login/twitch.ts',
+    'login/google': './src/login/google.ts',
+    'login/facebook': './src/login/facebook.ts'
   },
   mode: NODE_ENV,
   watch: isDevelopment,

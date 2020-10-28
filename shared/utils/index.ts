@@ -30,8 +30,9 @@ export const safeParse = (body?: string | null) => {
     }
 }
 
-export const toResponse = (body: { [key: string]: any }) => ({
-    statusCode: 200,
+export const responseJson = (body: { [key: string]: any }, headers?: { [key: string]: any }, statusCode = 200) => ({
+    headers,
+    statusCode,
     body: JSON.stringify(body)
 })
 

@@ -10,14 +10,14 @@ import Product from '../../../shared/models/product'
 
 export const getAuthorization = (token?: string) => {
     try {
-        if (token === undefined || token === '') return Authorization({}, false)
+        if (token === undefined || token === '') return Authorization({}, false, false)
 
         if (token.includes('.')) {
             const { payload } = JWT.verify({ token, keys: KeyManager.privateKeys })
 
             return Authorization(payload)
         } else {
-            return Authorization(JSON.parse(Buffer.from(token, 'base64').toString('utf8')))
+            return Authorization(JSON.parse(Buffer.from(token, 'base64').toString('utf8')), true)
         }
     } catch (error) {
         return Authorization({})

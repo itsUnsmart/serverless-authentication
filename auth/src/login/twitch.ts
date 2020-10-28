@@ -4,16 +4,16 @@ import User from '../../../shared/models/user'
 import { APIGatewayProxyHandlerV2 } from 'aws-lambda'
 import { responseJson, safeParse } from '../../../shared/utils'
 
-// https://discord.com/api/oauth2/authorize?client_id=771100200860123166&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code&scope=identify%20email
+// https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=33r8ldcmq7a8kfy5zhvkifmd4cu0gj&redirect_uri=http://localhost:3000&scope=user:read:email
 
 const client = OAuth({
-    client_id: '771100200860123166',
-    client_secret: 'OSUX6D-jms7cW__3WVY97Yo8Czsr7FRc',
+    client_id: '33r8ldcmq7a8kfy5zhvkifmd4cu0gj',
+    client_secret: '9pw9v8y9xwg5wkwrpv5mv8bfhbhoce',
     redirect_uri: 'http://localhost:3000',
-    scope: 'identify email'
+    scope: 'user:read:email'
 }, {
-    token: 'https://discord.com/api/oauth2/token',
-    user: 'https://discord.com/api/v6/users/@me'
+    token: 'https://id.twitch.tv/oauth2/token',
+    user: 'https://api.twitch.tv/helix/users'
 })
 
 export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
@@ -25,17 +25,17 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
         return responseJson({ error: 'No code' }, headers)
     }
 
-    const user_data = await client.getUser(body.code)
+    const user_res = await client.getUser(body.code)
+    const user_data = user_res.data[0]
 
     const user = User({
-        id: `discord_${user_data.id}`,
+        id: `twitch_${user_data.id}`,
         email: {
-            value: user_data.email,
-            verified: user_data.verified
+            value: user_data.email
         },
         name: {
-            tag: user_data.username,
-            display: user_data.username
+            tag: user_data.login,
+            display: user_data.display_name
         }
     })
 

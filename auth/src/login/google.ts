@@ -4,16 +4,16 @@ import User from '../../../shared/models/user'
 import { APIGatewayProxyHandlerV2 } from 'aws-lambda'
 import { responseJson, safeParse } from '../../../shared/utils'
 
-// https://discord.com/api/oauth2/authorize?client_id=771100200860123166&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code&scope=identify%20email
+// https://accounts.google.com/o/oauth2/v2/auth?response_type=code&access_type=offline&client_id=164424209671-js2k7pghm8mt8lol96160k0qaupvgn44.apps.googleusercontent.com&redirect_uri=http://localhost:3000&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
 
 const client = OAuth({
-    client_id: '771100200860123166',
-    client_secret: 'OSUX6D-jms7cW__3WVY97Yo8Czsr7FRc',
+    client_id: '164424209671-js2k7pghm8mt8lol96160k0qaupvgn44.apps.googleusercontent.com',
+    client_secret: 'og3JPzNveTCHFR9xupgnLK8S',
     redirect_uri: 'http://localhost:3000',
-    scope: 'identify email'
+    scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
 }, {
-    token: 'https://discord.com/api/oauth2/token',
-    user: 'https://discord.com/api/v6/users/@me'
+    token: 'https://oauth2.googleapis.com/token',
+    user: 'https://www.googleapis.com/oauth2/v3/userinfo'
 })
 
 export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
@@ -28,14 +28,14 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     const user_data = await client.getUser(body.code)
 
     const user = User({
-        id: `discord_${user_data.id}`,
+        id: `google_${user_data.sub}`,
         email: {
             value: user_data.email,
-            verified: user_data.verified
+            verified: user_data.email_verified
         },
         name: {
-            tag: user_data.username,
-            display: user_data.username
+            tag: user_data.given_name,
+            display: user_data.name
         }
     })
 

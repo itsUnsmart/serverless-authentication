@@ -34,6 +34,36 @@ functions:
       - httpApi:
           method: POST
           path: /login/discord
+  loginTwitch:
+    handler:
+      - ${self:custom.prefix.${self:custom.stage}}/login/twitch.handler
+    package:
+      include:
+        - ${self:custom.prefix.${self:custom.stage}}/login/twitch.ts
+    events:
+      - httpApi:
+          method: POST
+          path: /login/twitch
+  loginGoogle:
+    handler:
+      - ${self:custom.prefix.${self:custom.stage}}/login/google.handler
+    package:
+      include:
+        - ${self:custom.prefix.${self:custom.stage}}/login/google.ts
+    events:
+      - httpApi:
+          method: POST
+          path: /login/google
+  loginFacebook:
+    handler:
+      - ${self:custom.prefix.${self:custom.stage}}/login/facebook.handler
+    package:
+      include:
+        - ${self:custom.prefix.${self:custom.stage}}/login/facebook.ts
+    events:
+      - httpApi:
+          method: POST
+          path: /login/facebook
 
 plugins:
   - serverless-offline
