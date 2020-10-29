@@ -1,4 +1,5 @@
-// import User from '../models/user'
+import { APIGatewayProxyHandlerV2 } from './types'
+import { ApplicationError } from '../errors'
 
 export const cleanObject = <T>(object: T): Partial<T> => {
     if (typeof object !== 'object') return object
@@ -30,14 +31,30 @@ export const safeParse = (body?: string | null) => {
     }
 }
 
+export const toHandler = (handler: APIGatewayProxyHandlerV2): APIGatewayProxyHandlerV2 => {
+    return async (event, context) => {
+        const headers = { 'X-AWS-ID': context.awsRequestId }
+
+        event.parsedBody = safeParse(event.body)
+
+        try {
+            const result = await handler(event, context)
+
+            return result
+        } catch (e) {
+            const error = e instanceof ApplicationError ? e : new ApplicationError()
+
+            return responseJson({
+                error: error.errorText,
+                message: error.message,
+                requestId: context.awsRequestId
+            }, headers, error.statusCode)
+        }
+    }
+}
+
 export const responseJson = (body: { [key: string]: any }, headers?: { [key: string]: any }, statusCode = 200) => ({
     headers,
     statusCode,
     body: JSON.stringify(body)
 })
-
-// export const removeSensitive = (user: ReturnType<typeof User> | (ReturnType<typeof User>)[]) => {
-//     return (Array.isArray(user) ? user : [user]).map(user => {
-
-//     })
-// }

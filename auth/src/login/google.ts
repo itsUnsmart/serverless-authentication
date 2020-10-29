@@ -2,8 +2,7 @@ import OAuth from '../../../packages/oauth2/src'
 import User from '../../../shared/models/user'
 import Products from '../../../shared/products'
 
-import { APIGatewayProxyHandlerV2 } from 'aws-lambda'
-import { responseJson, safeParse } from '../../../shared/utils'
+import { responseJson, toHandler } from '../../../shared/utils'
 import { createAuthTokens } from '../../../packages/authorization/src'
 
 // https://accounts.google.com/o/oauth2/v2/auth?response_type=code&access_type=offline&client_id=164424209671-js2k7pghm8mt8lol96160k0qaupvgn44.apps.googleusercontent.com&redirect_uri=http://localhost:3000&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
@@ -18,16 +17,10 @@ const client = OAuth({
     user: 'https://www.googleapis.com/oauth2/v3/userinfo'
 })
 
-export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
+export const handler = toHandler(async (event, context) => {
     const headers = { 'X-AWS-ID': context.awsRequestId }
-    context.callbackWaitsForEmptyEventLoop = false
-    const body = safeParse(event.body)
 
-    if (!body.code || typeof body.code !== 'string') {
-        return responseJson({ error: 'No code' }, headers)
-    }
-
-    const user_data = await client.getUser(body.code)
+    const user_data = await client.getUser(event.parsedBody.code)
 
     const user = User({
         id: `google_${user_data.sub}`,
@@ -44,4 +37,4 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     // TODO: Create user in DB if not exists
 
     return responseJson(createAuthTokens({ user, product: Products.chat }), headers)
-}
+})
