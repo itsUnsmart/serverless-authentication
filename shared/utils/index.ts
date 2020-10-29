@@ -58,3 +58,10 @@ export const responseJson = (body: { [key: string]: any }, headers?: { [key: str
     statusCode,
     body: JSON.stringify(body)
 })
+
+export const redirectTo = (Location: string, statusCode = 302) => ({
+    headers: {
+        Location
+    },
+    statusCode
+})

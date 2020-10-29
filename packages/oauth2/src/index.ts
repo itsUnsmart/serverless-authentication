@@ -1,3 +1,5 @@
+import User from '../../../shared/models/user'
+
 import axios, { AxiosError } from 'axios'
 import querystring from 'querystring'
 
@@ -19,8 +21,10 @@ const correctedTokenType = (type: string) => {
     }
 }
 
-export default (client: IOAuthOptions, urls: { token: string, user: string }) => {
+export default (client: IOAuthOptions, urls: { token: string, user: string, authorize: string }, toUser: (data: any) => ReturnType<typeof User>) => {
+    const authorizeUrl = `${urls.authorize}?response_type=code&access_type=offline&client_id=${client.client_id}&redirect_uri=${client.redirect_uri}&scope=${client.scope}`
     return {
+        authorizeUrl,
         getUser: async (code: string) => {
             try {
                 if (!code || typeof code !== 'string') {
@@ -46,7 +50,7 @@ export default (client: IOAuthOptions, urls: { token: string, user: string }) =>
                     }
                 })
 
-                return user_data
+                return toUser(user_data)
             } catch (e) {
                 if ((e as AxiosError).isAxiosError) {
                     const error = e as AxiosError

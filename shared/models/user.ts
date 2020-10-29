@@ -1,5 +1,9 @@
 interface IUserPayload {
     id?: string
+    platform?: {
+        id?: string,
+        name?: string
+    }
     email?: {
         value?: string
         verified?: boolean
@@ -17,7 +21,7 @@ const isNumber = (value?: string) => {
 
 const platforms = ['discord', 'facebook', 'google', 'twitch']
 const isPlatformId = (value?: string) => {
-    return typeof value === 'string' && platforms.some(platform => value.startsWith(platform))
+    return typeof value === 'string' && platforms.some(platform => value.startsWith(`${platform}_`))
 }
 
 const ROLES = ['USER', 'MOD', 'ADMIN']
@@ -25,6 +29,10 @@ const ROLES = ['USER', 'MOD', 'ADMIN']
 export default (user: IUserPayload) => {
     return {
         id: user?.id,
+        platform: {
+            id: user?.platform?.id,
+            name: user.platform?.name
+        },
         email: {
             value: user?.email?.value,
             verified: user?.email?.verified
@@ -34,6 +42,6 @@ export default (user: IUserPayload) => {
             display: user?.name?.display
         },
         role: user && user.role && ROLES.includes(user.role.toUpperCase()) ? user.role.toUpperCase() : 'USER',
-        isValid: isNumber(user?.id) || isPlatformId(user?.id)
+        isValid: isNumber(user?.id) || isPlatformId(`${user.platform?.name}_${user?.platform?.id}`) // isPlatformCheck until DB stuff :)
     }
 }

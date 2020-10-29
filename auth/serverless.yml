@@ -7,8 +7,6 @@ provider:
   stage: staging
   httpApi:
     cors:
-      allowedOrigins:
-        - https://hoppscotch.io
       allowedHeaders:
         - Content-Type
         - Authorization
@@ -24,46 +22,26 @@ provider:
           - chat.smartprograms.co
 
 functions:
-  loginDiscord:
+  loginRedirect:
     handler:
-      - ${self:custom.prefix.${self:custom.stage}}/login/discord.handler
+      - ${self:custom.prefix.${self:custom.stage}}/login/redirect.handler
     package:
       include:
-        - ${self:custom.prefix.${self:custom.stage}}/login/discord.ts
+        - ${self:custom.prefix.${self:custom.stage}}/login/redirect.ts
+    events:
+      - httpApi:
+          method: GET
+          path: /login/oauth/{client}/redirect
+  loginPlatform:
+    handler:
+      - ${self:custom.prefix.${self:custom.stage}}/login/index.handler
+    package:
+      include:
+        - ${self:custom.prefix.${self:custom.stage}}/login/index.ts
     events:
       - httpApi:
           method: POST
-          path: /login/discord
-  loginTwitch:
-    handler:
-      - ${self:custom.prefix.${self:custom.stage}}/login/twitch.handler
-    package:
-      include:
-        - ${self:custom.prefix.${self:custom.stage}}/login/twitch.ts
-    events:
-      - httpApi:
-          method: POST
-          path: /login/twitch
-  loginGoogle:
-    handler:
-      - ${self:custom.prefix.${self:custom.stage}}/login/google.handler
-    package:
-      include:
-        - ${self:custom.prefix.${self:custom.stage}}/login/google.ts
-    events:
-      - httpApi:
-          method: POST
-          path: /login/google
-  loginFacebook:
-    handler:
-      - ${self:custom.prefix.${self:custom.stage}}/login/facebook.handler
-    package:
-      include:
-        - ${self:custom.prefix.${self:custom.stage}}/login/facebook.ts
-    events:
-      - httpApi:
-          method: POST
-          path: /login/facebook
+          path: /login/oauth/{client}
 
 plugins:
   - serverless-offline
