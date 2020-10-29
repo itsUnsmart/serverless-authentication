@@ -1,9 +1,9 @@
-import Products from '../../../shared/products'
-import Clients from '../../../shared/clients'
+import Products from '../../../../shared/products'
+import Clients from '../../../../shared/clients'
 
-import { responseJson, toHandler } from '../../../shared/utils'
-import { createAuthTokens } from '../../../packages/authorization/src'
-import { BadRequestError } from '../../../shared/errors'
+import { responseJson, toHandler } from '../../../../shared/utils'
+import { createAuthTokens } from '../../../../packages/authorization/src'
+import { BadRequestError } from '../../../../shared/errors'
 
 export const handler = toHandler(async (event, context) => {
     const headers = { 'X-AWS-ID': context.awsRequestId }

@@ -24,20 +24,20 @@ provider:
 functions:
   loginRedirect:
     handler:
-      - ${self:custom.prefix.${self:custom.stage}}/login/redirect.handler
+      - ${self:custom.prefix.${self:custom.stage}}/login/oauth/redirect.handler
     package:
       include:
-        - ${self:custom.prefix.${self:custom.stage}}/login/redirect.ts
+        - ${self:custom.prefix.${self:custom.stage}}/login/oauth/redirect.ts
     events:
       - httpApi:
           method: GET
           path: /login/oauth/{client}/redirect
   loginPlatform:
     handler:
-      - ${self:custom.prefix.${self:custom.stage}}/login/index.handler
+      - ${self:custom.prefix.${self:custom.stage}}/login/oauth/index.handler
     package:
       include:
-        - ${self:custom.prefix.${self:custom.stage}}/login/index.ts
+        - ${self:custom.prefix.${self:custom.stage}}/login/oauth/index.ts
     events:
       - httpApi:
           method: POST
