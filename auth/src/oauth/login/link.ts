@@ -12,7 +12,7 @@ export const handler = Functions.toHandler(async (event, context) => {
     const headers = { 'X-AWS-ID': context.awsRequestId }
 
     const authorization = getAuthorization(event.headers.Authorization?.toString())
-    if (!authorization.isValid) {
+    if (!authorization.isValid || authorization.refresh.isRefresh) {
         throw new AuthorizationError(authorization)
     }
 
