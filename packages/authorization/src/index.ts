@@ -8,6 +8,8 @@ import Authorization from '../../../shared/models/authorization'
 import User from '../../../shared/models/user'
 import Product from '../../../shared/models/product'
 
+import TokensRepository from '../../../packages/repository/src/tokens'
+
 export const getAuthorization = (token?: string) => {
     try {
         if (token === undefined || token === '') return Authorization({}, false, false)
@@ -25,7 +27,7 @@ export const getAuthorization = (token?: string) => {
 
 }
 
-export const createAuthTokens = ({ product, user }: { product: ReturnType<typeof Product>; user: ReturnType<typeof User> }) => {
+export const createAuthTokens = async ({ product, user }: { product: ReturnType<typeof Product>; user: ReturnType<typeof User> }) => {
     if (!product || !product.isValid) throw new Error('Authorization product is not valid.')
     else if (!user || !user.isValid) throw new Error('Authorization user is not valid.')
 
@@ -42,10 +44,11 @@ export const createAuthTokens = ({ product, user }: { product: ReturnType<typeof
         sub: user.id,
         aud: product.url,
         exp: Math.floor((Date.now() + Config.refreshExpires) / 1000),
-        jti: Nano.generate()
+        jti: Nano.generate() as string
     }
 
     const refreshToken = Buffer.from(JSON.stringify(refreshData)).toString('base64')
+    await TokensRepository.createRefreshToken(refreshData.jti, user)
 
     return {
         accessToken,

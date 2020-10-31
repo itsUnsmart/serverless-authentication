@@ -21,6 +21,7 @@
     "nodemon": "^2.0.4",
     "raw-loader": "^4.0.1",
     "serverless": "^2.8.0",
+    "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^6.8.0",
     "terser-webpack-plugin": "^4.1.0",
     "ts-loader": "^8.0.2",

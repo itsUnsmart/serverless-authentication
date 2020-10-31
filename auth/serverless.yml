@@ -5,6 +5,22 @@ provider:
   runtime: nodejs12.x
   region: us-east-1
   stage: staging
+
+  memorySize: 512
+
+  environment:
+      TABLE_NAME: ServerlessAuthTable-${self:custom.stage}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:Query
+      Resource:
+        - "Fn::GetAtt": [ServerlessAuthTable, Arn]
   httpApi:
     cors:
       allowedHeaders:
@@ -22,28 +38,62 @@ provider:
           - chat.smartprograms.co
 
 functions:
-  loginRedirect:
+  OAuthClients:
+    name: OAuth-List-Clients-${self:custom.stage}
     handler:
-      - ${self:custom.prefix.${self:custom.stage}}/login/oauth/redirect.handler
+      - ${self:custom.prefix.${self:custom.stage}}/oauth/clients/index.handler
     package:
       include:
-        - ${self:custom.prefix.${self:custom.stage}}/login/oauth/redirect.ts
+        - ${self:custom.prefix.${self:custom.stage}}/oauth/clients/index.ts
     events:
       - httpApi:
           method: GET
-          path: /login/oauth/{client}/redirect
-  loginPlatform:
+          path: /oauth/clients
+  OAuthLogin:
+    name: OAuth-Client-Login-${self:custom.stage}
     handler:
-      - ${self:custom.prefix.${self:custom.stage}}/login/oauth/index.handler
+      - ${self:custom.prefix.${self:custom.stage}}/oauth/login/index.handler
     package:
       include:
-        - ${self:custom.prefix.${self:custom.stage}}/login/oauth/index.ts
+        - ${self:custom.prefix.${self:custom.stage}}/oauth/login/index.ts
     events:
       - httpApi:
           method: POST
-          path: /login/oauth/{client}
+          path: /oauth/login/{client}
+  OAuthLoginRedirect:
+    name: OAuth-Login-Redirect-${self:custom.stage}
+    handler:
+      - ${self:custom.prefix.${self:custom.stage}}/oauth/login/redirect.handler
+    package:
+      include:
+        - ${self:custom.prefix.${self:custom.stage}}/oauth/login/redirect.ts
+    events:
+      - httpApi:
+          method: GET
+          path: /oauth/login/{client}/redirect
+
+resources:
+  Resources:
+    ServerlessAuthTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
 
 plugins:
+  - serverless-dynamodb-local
   - serverless-offline
   # - serverless-domain-manager
   # - serverless-prune-plugin
@@ -55,6 +105,13 @@ package:
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  dynamodb:
+    stages:
+      - staging
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
   prefix:
     prod: 'build'
     staging: 'dev-build'

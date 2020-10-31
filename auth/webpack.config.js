@@ -12,8 +12,9 @@ const isDevelopment = NODE_ENV === 'development'
 
 module.exports = {
   entry: {
-    'login/oauth/index': './src/login/oauth/index.ts',
-    'login/oauth/redirect': './src/login/oauth/redirect.ts'
+    'oauth/clients/index': './src/oauth/clients/index.ts',
+    'oauth/login/index': './src/oauth/login/index.ts',
+    'oauth/login/redirect': './src/oauth/login/redirect.ts'
   },
   mode: NODE_ENV,
   watch: isDevelopment,

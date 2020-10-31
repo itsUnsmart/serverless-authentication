@@ -22,7 +22,7 @@ const correctedTokenType = (type: string) => {
 }
 
 export default (client: IOAuthOptions, urls: { token: string, user: string, authorize: string }, toUser: (data: any) => ReturnType<typeof User>) => {
-    const authorizeUrl = `${urls.authorize}?response_type=code&access_type=offline&client_id=${client.client_id}&redirect_uri=${client.redirect_uri}&scope=${client.scope}`
+    const authorizeUrl = encodeURI(`${urls.authorize}?response_type=code&access_type=offline&client_id=${client.client_id}&redirect_uri=${client.redirect_uri}&scope=${client.scope}`)
     return {
         authorizeUrl,
         getUser: async (code: string) => {
