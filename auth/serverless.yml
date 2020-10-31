@@ -30,12 +30,6 @@ provider:
         - GET
         - POST
       allowCredentials: true
-    authorizers:
-      mainJwtAuthorizer:
-        identitySource: $request.header.Authorization
-        issuerUrl: auth.smartprograms.co
-        audience:
-          - chat.smartprograms.co
 
 functions:
   OAuthClients:
