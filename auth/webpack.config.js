@@ -14,6 +14,7 @@ module.exports = {
   entry: {
     'oauth/clients/index': './src/oauth/clients/index.ts',
     'oauth/login/index': './src/oauth/login/index.ts',
+    'oauth/login/link': './src/oauth/login/link.ts',
     'oauth/login/redirect': './src/oauth/login/redirect.ts'
   },
   mode: NODE_ENV,

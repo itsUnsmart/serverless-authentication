@@ -4,7 +4,7 @@ import NanoID from '../../nanoid/src'
 import User from '../../../shared/models/user'
 
 import { cleanObject } from '../../../shared/utils'
-import { ApplicationError, BadRequestError } from '../../../shared/errors'
+import { ApplicationError, AuthorizationError, BadRequestError } from '../../../shared/errors'
 
 const getUserById = async (id: string) => {
     if (!process.env.TABLE_NAME) {
@@ -16,7 +16,7 @@ const getUserById = async (id: string) => {
             TableName: process.env.TABLE_NAME,
             Key: {
                 PK: `USER#SA#${id}`,
-                SK: `USER#SA#${id}`
+                SK: 'userAccount'
             }
         }).promise()
 
@@ -39,7 +39,7 @@ const getUserByPlatform = async (user: ReturnType<typeof User>) => {
             TableName: process.env.TABLE_NAME,
             Key: {
                 PK: `USER#${user.platform.name.toUpperCase()}#${user.platform.id}`,
-                SK: `USER#${user.platform.name.toUpperCase()}#${user.platform.id}`
+                SK: 'linkedAccount'
             }
         }).promise()
 
@@ -77,7 +77,7 @@ const createUserByPlatform = async (user: ReturnType<typeof User>) => {
                         Item: {
                             ...cleanObject(updatedUser),
                             PK: `USER#SA#${id}`,
-                            SK: `USER#SA#${id}`
+                            SK: 'userAccount'
                         },
                         ConditionExpression: 'attribute_not_exists(PK)'
                     }
@@ -88,7 +88,9 @@ const createUserByPlatform = async (user: ReturnType<typeof User>) => {
                         Item: {
                             id,
                             PK: `USER#${user.platform.name.toUpperCase()}#${user.platform.id}`,
-                            SK: `USER#${user.platform.name.toUpperCase()}#${user.platform.id}`
+                            SK: 'linkedAccount',
+                            GSI1PK: `USER#SA#${id}`,
+                            GSI1SK: `USER#LINKED#${user.platform.name.toUpperCase()}#${user.platform.id}`
                         },
                         ConditionExpression: 'attribute_not_exists(PK)'
                     }
@@ -124,9 +126,37 @@ const getOrCreateUser = async (user: ReturnType<typeof User>) => {
     }
 }
 
+const linkAccount = async (user: ReturnType<typeof User>, externalUser: ReturnType<typeof User>) => {
+    if (!process.env.TABLE_NAME) {
+        throw new ApplicationError()
+    } else if (!user.isValid) {
+        throw new AuthorizationError()
+    } else if (!externalUser.platform || typeof externalUser.platform.name !== 'string' || !externalUser.platform.id) {
+        throw new BadRequestError('Invalid User Item')
+    }
+
+    try {
+        return await DB.documentClient.put({
+            TableName: process.env.TABLE_NAME,
+            Item: {
+                id: user.id,
+                PK: `USER#${externalUser.platform.name.toUpperCase()}#${externalUser.platform.id}`,
+                SK: 'linkedAccount',
+                GSI1PK: `USER#SA#${user.id}`,
+                GSI1SK: `USER#LINKED#${externalUser.platform.name.toUpperCase()}#${externalUser.platform.id}`,
+                ConditionExpression: 'attribute_not_exists(PK)'
+            }
+        }).promise()
+    } catch (error) {
+        // TODO: Handle DB Errors
+        throw error
+    }
+}
+
 export default {
     getOrCreateUser,
     getUserByPlatform,
     createUserByPlatform,
-    getUserById
+    getUserById,
+    linkAccount
 }

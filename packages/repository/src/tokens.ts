@@ -34,7 +34,7 @@ const getUserByRefreshToken = async (token: string, userid: string) => {
     }
 }
 
-const createRefreshToken = async (token: string, user: ReturnType<typeof User>) => {
+const createRefreshToken = async (token: string, user: ReturnType<typeof User>, ttl: number) => {
     if (!process.env.TABLE_NAME) {
         throw new ApplicationError()
     } else if (!user.isValid) {
@@ -47,7 +47,8 @@ const createRefreshToken = async (token: string, user: ReturnType<typeof User>) 
             Item: {
                 PK: `REFRESH#USER#${user.id}`,
                 SK: `TOKEN#${token}`,
-                id: user.id
+                id: user.id,
+                ttl
             },
             ConditionExpression: 'attribute_not_exists(SK)'
         }).promise()

@@ -60,6 +60,17 @@ functions:
       - httpApi:
           method: POST
           path: /oauth/login/{client}
+  OAuthLoginLink:
+    name: OAuth-Client-Login-Link-${self:custom.stage}
+    handler:
+      - ${self:custom.prefix.${self:custom.stage}}/oauth/login/link.handler
+    package:
+      include:
+        - ${self:custom.prefix.${self:custom.stage}}/oauth/login/link.ts
+    events:
+      - httpApi:
+          method: POST
+          path: /oauth/login/{client}/link
   OAuthLoginRedirect:
     name: OAuth-Login-Redirect-${self:custom.stage}
     handler:
@@ -78,16 +89,35 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:provider.environment.TABLE_NAME}
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
         AttributeDefinitions:
           - AttributeName: PK
             AttributeType: S
           - AttributeName: SK
+            AttributeType: S
+          - AttributeName: GSI1PK
+            AttributeType: S
+          - AttributeName: GSI1SK
             AttributeType: S
         KeySchema:
           - AttributeName: PK
             KeyType: HASH
           - AttributeName: SK
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: GSI1
+            KeySchema:
+              - AttributeName: GSI1PK
+                KeyType: HASH
+              - AttributeName: GSI1SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: 'ALL'
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5

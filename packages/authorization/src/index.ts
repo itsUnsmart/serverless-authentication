@@ -12,14 +12,15 @@ import TokensRepository from '../../../packages/repository/src/tokens'
 
 export const getAuthorization = (token?: string) => {
     try {
-        if (token === undefined || token === '') return Authorization({}, false, false)
+        if (token === undefined || token === '' || token.split(' ').length !== 2) return Authorization({}, false, false)
+        token = token.split(' ')[1]
 
         if (token.includes('.')) {
             const { payload } = JWT.verify({ token, keys: KeyManager.privateKeys })
 
             return Authorization(payload)
         } else {
-            return Authorization(JSON.parse(Buffer.from(token, 'base64').toString('utf8')), true)
+            return Authorization({}, false, true)
         }
     } catch (error) {
         return Authorization({})
@@ -48,7 +49,7 @@ export const createAuthTokens = async ({ product, user }: { product: ReturnType<
     }
 
     const refreshToken = Buffer.from(JSON.stringify(refreshData)).toString('base64')
-    await TokensRepository.createRefreshToken(refreshData.jti, user)
+    await TokensRepository.createRefreshToken(refreshData.jti, user, refreshData.exp)
 
     return {
         accessToken,

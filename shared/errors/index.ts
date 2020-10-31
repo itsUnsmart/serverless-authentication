@@ -27,11 +27,11 @@ export class ApplicationError extends Error {
 }
 
 export class AuthorizationError extends ApplicationError {
-    constructor(auth: ReturnType<typeof Authorization>) {
-        if (auth.provided && auth.isValid) {
+    constructor(auth?: ReturnType<typeof Authorization>) {
+        if (auth && auth.provided && auth.isValid) {
             super(`This action is not allowed with your current authorization.`, 403)
         } else {
-            super(`This action required authorization.`, 401)
+            super(`This action requires authorization.`, 401)
         }
     }
 }
