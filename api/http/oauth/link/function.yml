@@ -1,0 +1,7 @@
+
+linkOAuthAccount:
+  handler: api/http/oauth/link/controller.handle
+  events:
+    - httpApi:
+        method: POST
+        path: /oauth/link

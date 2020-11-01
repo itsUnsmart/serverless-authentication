@@ -1,0 +1,69 @@
+service:
+  name: serverless-authentication
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-dynamodb-local
+  - serverless-webpack
+  - serverless-offline
+  # - serverless-domain-manager
+  # - serverless-prune-plugin
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+
+  logs:
+    httpApi: true
+  stackTags:
+    Environment: ${self:custom.stage}
+
+  # Function defaults
+  memorySize: 512
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    DYNAMO_TABLE_NAME: datastore-${self:provider.stage}
+
+  httpApi:
+    cors:
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - GET
+        - POST
+      allowCredentials: true
+
+functions:
+  # HTTP API
+  - ${file(./api/http/oauth/clients/list/function.yml)}
+  - ${file(./api/http/oauth/link/function.yml)}
+  - ${file(./api/http/oauth/login/function.yml)}
+
+resources:
+  # DynamoDB
+  - ${file(./infra/dynamodb/tables.yml)}
+
+custom:
+  stage: ${opt:stage, 'local'}
+
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+
+  # domains:
+  #   prod: 'auth.gchserverless.com'
+  #   staging: 'staging-auth.gchserverless.com'
+  # customDomain:
+  #   domainName: ${self:custom.domains.${self:custom.stage}}
+  #   basePath: 'users'
+  #   stage: ${self:custom.stage}
+  #   createRoute53Record: true
+  # prune:
+  #   automatic: true
+  #   number: 2

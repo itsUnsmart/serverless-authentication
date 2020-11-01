@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "outDir": "lib",
+        "target": "es2018",
+        "moduleResolution": "node",
+        "sourceMap": true,
+
+        // Strict
+        "strict": true,
+        "alwaysStrict": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictPropertyInitialization": true,
+
+        // No unused/implicit
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noImplicitAny": true
+    }
+}

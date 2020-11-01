@@ -1,7 +1,4 @@
-**/.serverless/
-**/node_modules/
-
-**/*build/
-**/*.env*
-
+**/node_modules
+**/.webpack
 **/.dynamodb
+**/.env**

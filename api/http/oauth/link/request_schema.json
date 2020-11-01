@@ -1,0 +1,19 @@
+{
+    "definitions": {},
+    "type": "object",
+    "title": "AccountLink",
+    "required": ["code", "clientid", "provider"],
+    "properties": {
+        "code": {
+            "type": "string",
+            "title": "Code from the provider",
+            "minLength": 1
+        },
+        "provider": {
+            "type": "string",
+            "title": "Name of the provider used to login",
+            "pattern": "^[a-zA-Z]+$",
+            "minLength": 1
+        }
+    }
+}

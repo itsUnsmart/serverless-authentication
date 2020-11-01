@@ -1,0 +1,7 @@
+
+listOAuthClients:
+  handler: api/http/oauth/clients/list/controller.handle
+  events:
+    - httpApi:
+        method: GET
+        path: /oauth/clients

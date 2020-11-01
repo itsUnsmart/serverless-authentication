@@ -1,0 +1,7 @@
+
+loginOAuthAccount:
+  handler: api/http/oauth/login/controller.handle
+  events:
+    - httpApi:
+        method: POST
+        path: /oauth/login
