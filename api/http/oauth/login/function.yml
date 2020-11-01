@@ -1,6 +1,7 @@
 
 loginOAuthAccount:
   handler: api/http/oauth/login/controller.handle
+  role: DynamoGetPutItemRole
   events:
     - httpApi:
         method: POST

@@ -45,6 +45,9 @@ resources:
   # DynamoDB
   - ${file(./infra/dynamodb/tables.yml)}
 
+  # IAM
+  - ${file(./infra/dynamodb/roles.yml)}
+
 custom:
   stage: ${opt:stage, 'local'}
 

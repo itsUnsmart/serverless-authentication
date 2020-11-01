@@ -1,6 +1,7 @@
 
 linkOAuthAccount:
   handler: api/http/oauth/link/controller.handle
+  role: DynamoPutItemRole
   events:
     - httpApi:
         method: POST
