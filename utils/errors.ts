@@ -9,20 +9,19 @@ export class ApplicationError extends Error {
         super(message)
         this.name = this.constructor.name
         this.statusCode = statusCode
+        this.errorText = this.getErrorText()
+    }
 
-        switch(statusCode) {
+    private getErrorText() {
+        switch(this.statusCode) {
             case 400:
-                this.errorText = 'Bad Request'
-                break
+                return 'Bad Request'
             case 401:
-                this.errorText = 'Unauthorized'
-                break
+                return 'Unauthorized'
             case 403:
-                this.errorText = 'Forbidden'
-                break
+                return 'Forbidden'
             default:
-                this.errorText = 'Internal Server Error'
-                break
+                return 'Internal Server Error'
         }
     }
 }
@@ -43,12 +42,11 @@ export class BadRequestError extends ApplicationError {
     }
 }
 
+const isDynamoError = (error: any) => uuidv4.validate((error as any).requestId) && typeof (error as any).code === 'string'
+
 export const getDynamoError = (e: any) => {
     const error = e instanceof Error ? e : new ApplicationError()
 
-    if (uuidv4.validate((error as any).requestId) && typeof (error as any).code === 'string') {
-        throw new ApplicationError(`Database Error: ${(error as any).code}`)
-    } else {
-        throw error
-    }
+    if (isDynamoError(error)) throw new ApplicationError(`An internal error has occurred. ${e.code}.`)
+    else throw error
 }
